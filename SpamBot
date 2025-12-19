@@ -20,6 +20,63 @@ local Config = {
 	Delay = 0.6
 }
 
+local DelayConfig = {
+	Base = 0.6,
+	Jitter = 0.25,
+	BurstLimit = 5,
+	BurstCooldown = 2.5
+}
+
+local function NeedsSanitize(msg)
+	if #msg > 80 then return true end
+	if msg:find("%u%u%u%u%u") then return true end
+	if msg:find("%d%d%d%d") then return true end
+	if msg:find("%s%s") then return true end
+	return false
+end
+
+local function SanitizeMessage(msg)
+	msg = msg:gsub("[^%w%s]", "")
+	msg = msg:gsub("%s+", " ")
+
+	local map = {
+		a = "@", b = "8", c = "(", d = ")", e = "3",
+		f = "ƒ", g = "9", h = "#", i = "1", j = "]",
+		k = "{", l = "!", m = "^^", n = "~",
+		o = "0", p = "¶", q = "9", r = "2",
+		s = "$", t = "+", u = "µ", v = "\\/",
+		w = "\\/\\/", x = "%", y = "7", z = "2"
+	}
+
+	return msg:gsub("%a", function(char)
+		return map[char:lower()] or char
+	end)
+end
+
+local function SmartSanitize(msg)
+	if NeedsSanitize(msg) then
+		return SanitizeMessage(msg)
+	end
+	return msg
+end
+
+local function StylizePreview(msg)
+	local map = {
+		a = "4", e = "3", i = "1", o = "0",
+		s = "5", y = "7", t = "7"
+	}
+
+	return msg:gsub("%a", function(char)
+		local lower = char:lower()
+		if map[lower] then
+			-- keep original case feel
+			return map[lower]
+		end
+		return char
+	end)
+end
+
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "Fr33kySpammer"
 ScreenGui.Parent = game.CoreGui or LocalPlayer:WaitForChild("PlayerGui")
@@ -446,16 +503,32 @@ local function StartSpamming(messages)
 				if not isSpamming then break end
 
 				local prefix = GetCurrentPrefix()
-				local fullMessage = prefix .. ' "' .. msg .. '" ' .. Quotes[math.random(#Quotes)]
+				local cleanMsg = SmartSanitize(msg)
+				local cleanQuote = SmartSanitize(Quotes[math.random(#Quotes)])
 
+				local fullMessage = prefix .. ' "' .. cleanMsg .. '" ' .. cleanQuote
 				local success = SendMessage(fullMessage)
+				
+				local sentInBurst = 0
 
-				if success then
-					messagesSent = messagesSent + 1
-					StatusLabel.Text = "Sent: " .. messagesSent
-				elseif Settings.SmartPause then
-					wait(Config.Delay * 2)
+				local function waitDelay()
+					local jitter = math.random() * DelayConfig.Jitter
+					task.wait(DelayConfig.Base + jitter)
 				end
+				
+				if success then
+					messagesSent += 1
+					sentInBurst += 1
+					StatusLabel.Text = "Sent: " .. messagesSent
+				end
+
+				if sentInBurst >= DelayConfig.BurstLimit then
+					task.wait(DelayConfig.BurstCooldown)
+					sentInBurst = 0
+				else
+					waitDelay()
+				end
+
 
 				wait(Config.Delay)
 			end
