@@ -1,0 +1,605 @@
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local Colors = {
+	BG = Color3.fromRGB(20, 20, 28),
+	HEADER = Color3.fromRGB(30, 30, 40),
+	PANEL = Color3.fromRGB(40, 40, 50),
+	BUTTON = Color3.fromRGB(55, 55, 75),
+	ACCENT = Color3.fromRGB(0, 180, 255),
+	GREEN = Color3.fromRGB(0, 200, 100),
+	RED = Color3.fromRGB(255, 80, 80),
+	TEXT = Color3.fromRGB(240, 240, 240),
+	SUBTEXT = Color3.fromRGB(170, 170, 180)
+}
+
+local Config = {
+	Delay = 0.6
+}
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "Fr33kySpammer"
+ScreenGui.Parent = game.CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 340)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -170)
+MainFrame.BackgroundColor3 = Colors.BG
+MainFrame.BorderSizePixel = 0
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = MainFrame
+
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 35)
+Header.BackgroundColor3 = Colors.HEADER
+Header.BorderSizePixel = 0
+Header.Parent = MainFrame
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 8, 0, 0)
+HeaderCorner.Parent = Header
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.Position = UDim2.new(0.05, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Fr3ky SPAMMER ⚡"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.TextColor3 = Colors.ACCENT
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Header
+
+local dragging = false
+local dragStart
+local startPos
+
+Header.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = MainFrame.Position
+	end
+end)
+
+Header.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		MainFrame.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(0.75, 0, 0.5, -15)
+MinimizeBtn.Text = "_"
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 16
+MinimizeBtn.TextColor3 = Colors.TEXT
+MinimizeBtn.BackgroundColor3 = Colors.BUTTON
+MinimizeBtn.BorderSizePixel = 0
+MinimizeBtn.Parent = Header
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(0.85, 0, 0.5, -15)
+CloseBtn.Text = "×"
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 16
+CloseBtn.TextColor3 = Colors.TEXT
+CloseBtn.BackgroundColor3 = Colors.RED
+CloseBtn.BorderSizePixel = 0
+CloseBtn.Parent = Header
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, 0, 1, -35)
+Content.Position = UDim2.new(0, 0, 0, 35)
+Content.BackgroundTransparency = 1
+Content.Parent = MainFrame
+
+local Inputs = {}
+for i = 1, 3 do
+	local inputFrame = Instance.new("Frame")
+	inputFrame.Size = UDim2.new(0.9, 0, 0, 38)
+	inputFrame.Position = UDim2.new(0.05, 0, 0.05 + (i-1) * 0.18, 0)
+	inputFrame.BackgroundColor3 = Colors.PANEL
+	inputFrame.BorderSizePixel = 0
+
+	local inputCorner = Instance.new("UICorner")
+	inputCorner.CornerRadius = UDim.new(0, 6)
+	inputCorner.Parent = inputFrame
+
+	local textBox = Instance.new("TextBox")
+	textBox.Name = "Input" .. i
+	textBox.Size = UDim2.new(0.95, -10, 0.7, 0)
+	textBox.Position = UDim2.new(0, 8, 0.15, 0)
+	textBox.Text = ""
+	textBox.PlaceholderText = "Message " .. i .. " (use | to separate)"
+	textBox.ClearTextOnFocus = false
+	textBox.Font = Enum.Font.Gotham
+	textBox.TextSize = 12
+	textBox.TextColor3 = Colors.TEXT
+	textBox.PlaceholderColor3 = Colors.SUBTEXT
+	textBox.BackgroundTransparency = 1
+	textBox.TextXAlignment = Enum.TextXAlignment.Left
+
+	textBox.Parent = inputFrame
+	inputFrame.Parent = Content
+	table.insert(Inputs, textBox)
+end
+
+Inputs[1].Text = "Made by Bober"
+Inputs[2].Text = "Blue The Contributor"
+Inputs[3].Text = "Sassy H8rs"
+
+local DelayFrame = Instance.new("Frame")
+DelayFrame.Size = UDim2.new(0.9, 0, 0, 50)
+DelayFrame.Position = UDim2.new(0.05, 0, 0.55, 0)
+DelayFrame.BackgroundColor3 = Colors.PANEL
+DelayFrame.BorderSizePixel = 0
+DelayFrame.Parent = Content
+
+local DelayCorner = Instance.new("UICorner")
+DelayCorner.CornerRadius = UDim.new(0, 6)
+DelayCorner.Parent = DelayFrame
+
+local DelayTitle = Instance.new("TextLabel")
+DelayTitle.Size = UDim2.new(1, 0, 0.3, 0)
+DelayTitle.Text = "DELAY: " .. Config.Delay .. "s"
+DelayTitle.Font = Enum.Font.GothamBold
+DelayTitle.TextSize = 12
+DelayTitle.TextColor3 = Colors.TEXT
+DelayTitle.BackgroundTransparency = 1
+DelayTitle.TextXAlignment = Enum.TextXAlignment.Center
+DelayTitle.Parent = DelayFrame
+
+local DelayButtons = Instance.new("Frame")
+DelayButtons.Size = UDim2.new(0.9, 0, 0.6, 0)
+DelayButtons.Position = UDim2.new(0.05, 0, 0.35, 0)
+DelayButtons.BackgroundTransparency = 1
+DelayButtons.Parent = DelayFrame
+
+local function CreateDelayButton(text, delay, xPos)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.3, -2, 1, 0)
+	btn.Position = UDim2.new(xPos, 0, 0, 0)
+	btn.Text = text .. "\n" .. delay .. "s"
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 10
+	btn.TextColor3 = Colors.TEXT
+	btn.BackgroundColor3 = (Config.Delay == delay) and Colors.GREEN or Colors.BUTTON
+	btn.BorderSizePixel = 0
+	btn.TextYAlignment = Enum.TextYAlignment.Center
+
+	btn.MouseButton1Click:Connect(function()
+		Config.Delay = delay
+		DelayTitle.Text = "DELAY: " .. Config.Delay .. "s"
+
+		for _, child in pairs(DelayButtons:GetChildren()) do
+			if child:IsA("TextButton") then
+				child.BackgroundColor3 = Colors.BUTTON
+			end
+		end
+		btn.BackgroundColor3 = Colors.GREEN
+	end)
+
+	btn.Parent = DelayButtons
+	return btn
+end
+
+CreateDelayButton("FAST", 0.3, 0)
+CreateDelayButton("MED", 0.6, 0.34)
+CreateDelayButton("SLOW", 1.2, 0.68)
+
+local PrefixFrame = Instance.new("Frame")
+PrefixFrame.Size = UDim2.new(0.9, 0, 0, 40)
+PrefixFrame.Position = UDim2.new(0.05, 0, 0.72, 0)
+PrefixFrame.BackgroundColor3 = Colors.PANEL
+PrefixFrame.BorderSizePixel = 0
+PrefixFrame.Parent = Content
+
+local PrefixCorner2 = Instance.new("UICorner")
+PrefixCorner2.CornerRadius = UDim.new(0, 6)
+PrefixCorner2.Parent = PrefixFrame
+
+local PrefixTitle = Instance.new("TextLabel")
+PrefixTitle.Size = UDim2.new(1, 0, 0.3, 0)
+PrefixTitle.Text = "PREFIX TYPE"
+PrefixTitle.Font = Enum.Font.GothamBold
+PrefixTitle.TextSize = 11
+PrefixTitle.TextColor3 = Colors.SUBTEXT
+PrefixTitle.BackgroundTransparency = 1
+PrefixTitle.TextXAlignment = Enum.TextXAlignment.Center
+PrefixTitle.Parent = PrefixFrame
+
+local Prefix1 = Instance.new("TextButton")
+Prefix1.Size = UDim2.new(0.2, 0, 0.6, 0)
+Prefix1.Position = UDim2.new(0.04, 0, 0.35, 0)
+Prefix1.Text = "__"
+Prefix1.Font = Enum.Font.GothamBold
+Prefix1.TextSize = 11
+Prefix1.TextColor3 = Colors.TEXT
+Prefix1.BackgroundColor3 = Colors.ACCENT
+Prefix1.BorderSizePixel = 0
+Prefix1.Parent = PrefixFrame
+
+local Prefix2 = Instance.new("TextButton")
+Prefix2.Size = UDim2.new(0.2, 0, 0.6, 0)
+Prefix2.Position = UDim2.new(0.26, 0, 0.35, 0)
+Prefix2.Text = "##"
+Prefix2.Font = Enum.Font.GothamBold
+Prefix2.TextSize = 11
+Prefix2.TextColor3 = Colors.TEXT
+Prefix2.BackgroundColor3 = Colors.BUTTON
+Prefix2.BorderSizePixel = 0
+Prefix2.Parent = PrefixFrame
+
+local Prefix3 = Instance.new("TextButton")
+Prefix3.Size = UDim2.new(0.2, 0, 0.6, 0)
+Prefix3.Position = UDim2.new(0.48, 0, 0.35, 0)
+Prefix3.Text = "-_-"
+Prefix3.Font = Enum.Font.GothamBold
+Prefix3.TextSize = 11
+Prefix3.TextColor3 = Colors.TEXT
+Prefix3.BackgroundColor3 = Colors.BUTTON
+Prefix3.BorderSizePixel = 0
+Prefix3.Parent = PrefixFrame
+
+local Prefix4 = Instance.new("TextButton")
+Prefix4.Size = UDim2.new(0.2, 0, 0.6, 0)
+Prefix4.Position = UDim2.new(0.70, 0, 0.35, 0)
+Prefix4.Text = "~~"
+Prefix4.Font = Enum.Font.GothamBold
+Prefix4.TextSize = 11
+Prefix4.TextColor3 = Colors.TEXT
+Prefix4.BackgroundColor3 = Colors.BUTTON
+Prefix4.BorderSizePixel = 0
+Prefix4.Parent = PrefixFrame
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, 0, 0, 25)
+StatusLabel.Position = UDim2.new(0, 0, 0.82, 0)
+StatusLabel.Text = "Ready to spam..."
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 12
+StatusLabel.TextColor3 = Colors.GREEN
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Parent = Content
+
+local ControlFrame = Instance.new("Frame")
+ControlFrame.Size = UDim2.new(0.9, 0, 0, 35)
+ControlFrame.Position = UDim2.new(0.05, 0, 0.88, 0)
+ControlFrame.BackgroundTransparency = 1
+ControlFrame.Parent = Content
+
+local StartBtn = Instance.new("TextButton")
+StartBtn.Size = UDim2.new(0.65, 0, 1, 0)
+StartBtn.Text = "▶ START"
+StartBtn.Font = Enum.Font.GothamBlack
+StartBtn.TextSize = 13
+StartBtn.TextColor3 = Colors.TEXT
+StartBtn.BackgroundColor3 = Colors.GREEN
+StartBtn.BorderSizePixel = 0
+StartBtn.Parent = ControlFrame
+
+local SettingsBtn = Instance.new("TextButton")
+SettingsBtn.Size = UDim2.new(0.3, 0, 1, 0)
+SettingsBtn.Position = UDim2.new(0.68, 5, 0, 0)
+SettingsBtn.Text = "⚙"
+SettingsBtn.Font = Enum.Font.GothamBold
+SettingsBtn.TextSize = 15
+SettingsBtn.TextColor3 = Colors.TEXT
+SettingsBtn.BackgroundColor3 = Colors.BUTTON
+SettingsBtn.BorderSizePixel = 0
+SettingsBtn.Parent = ControlFrame
+
+MainFrame.Parent = ScreenGui
+
+local Prefixes = {
+	{full = "__________________________________________________________________________________________________", label = "__"},
+	{full = "###################################################################################################", label = "##"},
+	{full = "-_-_--_-_--_-_--_-_--_--_--_--_--_--_--_--_--_--_--_-_--_-_--_-_--_-_--_-_--_-_--_-_--_-_--_-_--_--_--_--_--_--_--_-_--_-_--", label = "-_-"},
+	{full = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", label = "~~"}
+}
+local CurrentPrefix = 1
+
+local Settings = {
+	RandomOrder = false,
+	SmartPause = false,
+	RandomPrefix = false
+}
+
+local Quotes = {
+	"TMKX MAI LATOP", "TMKX MAI PYAZ" ," TMKX MAI CHARGER ", "TMKC MAI TV", "TMKC MAI PHONE", "TMKC MAI VIBRATOR", "TMKC MAI JCB", "TMKC MAI BOBER", "TMKC MAI AIDS", "TMKC MAI SAAP", "TMKC MAI LUND", "TMKC MAI CAR", "TMKC MAI LIPSTICK", "TMKC MAI BLOX", "TMKC MAI BOX", "TMKC MAI FRIES", "TMKC MAI LIGHPOLE", "TMKC MAI BADAL", "TMKC MAI HULK", "TMKC MAI GULAB JAMUN", "TMKC MAI MOMOS", "TMKC MAI BURGER", "TMKC MAI PIZZA", "TMKC MAI CHICKEN", "TMKC MAI BIRYANI", "TMKC MAI PANEER", "TMKC MAI CHOLE", "TMKC MAI RICE", "TMKC MAI DAAL", "TMKX MAI FAFDA", "TERI BEHEN KI IJAAT LUTU" ,"TERI BEHEN KO LODA CHUSAU", "TERI AMMI KI GAJB CHUTT CHDOU", "TERI AMMI KI GULABI CHUT ME LODA DALU", "TERI AMMI KI FATTI CHUT KA BOXDA BNAU", "TERI AMMI KI MOTI CHUCHI PAR LODA JHADU", "TERI AMMI KO LUND CHUSAU", "TERI AMMI KI KALI GAND MARU", "TERI AMMI KI CHUT NAMAK LGAKAR CHODU", "TERI AMMI KI BAASI CHUT ME LAL MIRCH DALU", "TERI AMMI KI PYAASI CHUT KI PYAAS BUJHAU", "TERI AMMI KI CHUTT KA TINNA KAATU", "TERI AMMI KO RANDI KHANE ME LEJAR CHODU", "TERI AMMI KI CHUT ME UNGLI DALU", "TERI AMMI KI CHUT KA BOXDA BNAU", "TERI AMMI KI CHUT PAR CHAPPAL MARU", "TERI AMMI KI CHUT PAR LAAT MARU", "TERI AMMI KI CHUT OYO ME LEJAR CHODU", "TERI AMMI KI NASILI CHUT CHODU", "TERE ABBA KI GAND MARU", "TERE ABBA KI GAND PAR BELT MARU", "TERE ABBU KI AMMI JAAN CHODU", "TERE ABBU KI GAND BICH LODA DALU", "TERE ABBA KI CHOTI LADKI CHODU", "TERE ABBA KI CHOTI LADKI KI SEAL TODU", "TERE ABBA KI LADKI KI CHUT SE PANI NIKALU", "TERE ABBA KI LADKI KI GORI CHUT CHODU", "TERI AMMI KI LADKI KI GORI CHUT CHOU", "TERI KHALA KI BEHEN CHODU", "ऊपर से गिरी इस्त्री, तेरी माँ को चोद के भाग गये मिस्त्री ", "खरगोश का लोड़ा", "गांड म दही दे के छोड़ेगा लस्सी बन के निकलेगी"
+}
+
+local function UpdatePrefixButtons()
+	Prefix1.BackgroundColor3 = (CurrentPrefix == 1 and not Settings.RandomPrefix) and Colors.ACCENT or Colors.BUTTON
+	Prefix2.BackgroundColor3 = (CurrentPrefix == 2 and not Settings.RandomPrefix) and Colors.ACCENT or Colors.BUTTON
+	Prefix3.BackgroundColor3 = (CurrentPrefix == 3 and not Settings.RandomPrefix) and Colors.ACCENT or Colors.BUTTON
+	Prefix4.BackgroundColor3 = (CurrentPrefix == 4 and not Settings.RandomPrefix) and Colors.ACCENT or Colors.BUTTON
+end
+
+Prefix1.MouseButton1Click:Connect(function()
+	Settings.RandomPrefix = false
+	CurrentPrefix = 1
+	UpdatePrefixButtons()
+	StatusLabel.Text = "Prefix: __"
+	wait(1)
+	StatusLabel.Text = "Ready..."
+end)
+
+Prefix2.MouseButton1Click:Connect(function()
+	Settings.RandomPrefix = false
+	CurrentPrefix = 2
+	UpdatePrefixButtons()
+	StatusLabel.Text = "Prefix: ##"
+	wait(1)
+	StatusLabel.Text = "Ready..."
+end)
+
+Prefix3.MouseButton1Click:Connect(function()
+	Settings.RandomPrefix = false
+	CurrentPrefix = 3
+	UpdatePrefixButtons()
+	StatusLabel.Text = "Prefix: -_-"
+	wait(1)
+	StatusLabel.Text = "Ready..."
+end)
+
+Prefix4.MouseButton1Click:Connect(function()
+	Settings.RandomPrefix = false
+	CurrentPrefix = 4
+	UpdatePrefixButtons()
+	StatusLabel.Text = "Prefix: ~~"
+	wait(1)
+	StatusLabel.Text = "Ready..."
+end)
+
+local function SendMessage(msg)
+	if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+		local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+		if channel then
+			channel:SendAsync(msg)
+			return true
+		end
+	end
+
+	local events = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+	if events then
+		local sayMessage = events:FindFirstChild("SayMessageRequest")
+		if sayMessage then
+			sayMessage:FireServer(msg, "All")
+			return true
+		end
+	end
+
+	local chatService = game:GetService("Chat")
+	if chatService then
+		chatService:Chat(LocalPlayer.Character, msg)
+		return true
+	end
+
+	return false
+end
+
+local function ParseMessages(text)
+	local messages = {}
+	for msg in string.gmatch(text, "[^|]+") do
+		msg = msg:gsub("^%s+", ""):gsub("%s+$", "")
+		if msg ~= "" then
+			table.insert(messages, msg)
+		end
+	end
+	return messages
+end
+
+local function GetCurrentPrefix()
+	if Settings.RandomPrefix then
+		return Prefixes[math.random(#Prefixes)].full
+	else
+		return Prefixes[CurrentPrefix].full
+	end
+end
+
+local isSpamming = false
+local messagesSent = 0
+
+local function StartSpamming(messages)
+	if isSpamming then return end
+
+	isSpamming = true
+	messagesSent = 0
+	StartBtn.Text = "⏹ STOP"
+	StartBtn.BackgroundColor3 = Colors.RED
+	StatusLabel.Text = "Sending..."
+
+	spawn(function()
+		while isSpamming do
+			local messageList = messages
+
+			if Settings.RandomOrder then
+				for i = #messageList, 2, -1 do
+					local j = math.random(i)
+					messageList[i], messageList[j] = messageList[j], messageList[i]
+				end
+			end
+
+			for _, msg in ipairs(messageList) do
+				if not isSpamming then break end
+
+				local prefix = GetCurrentPrefix()
+				local fullMessage = prefix .. ' "' .. msg .. '" ' .. Quotes[math.random(#Quotes)]
+
+				local success = SendMessage(fullMessage)
+
+				if success then
+					messagesSent = messagesSent + 1
+					StatusLabel.Text = "Sent: " .. messagesSent
+				elseif Settings.SmartPause then
+					wait(Config.Delay * 2)
+				end
+
+				wait(Config.Delay)
+			end
+		end
+	end)
+end
+
+local function StopSpamming()
+	isSpamming = false
+	StartBtn.Text = "▶ START"
+	StartBtn.BackgroundColor3 = Colors.GREEN
+	StatusLabel.Text = "Total: " .. messagesSent
+end
+
+local minimized = false
+MinimizeBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		MainFrame.Size = UDim2.new(0, 120, 0, 35)
+		MainFrame.Position = UDim2.new(0, 10, 0, 10)
+		Content.Visible = false
+		MinimizeBtn.Text = "+"
+	else
+		MainFrame.Size = UDim2.new(0, 300, 0, 340)
+		MainFrame.Position = UDim2.new(0.5, -150, 0.5, -170)
+		Content.Visible = true
+		MinimizeBtn.Text = "_"
+	end
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+	StopSpamming()
+	ScreenGui:Destroy()
+end)
+
+StartBtn.MouseButton1Click:Connect(function()
+	if isSpamming then
+		StopSpamming()
+	else
+		local allMessages = {}
+		for _, input in ipairs(Inputs) do
+			local parsed = ParseMessages(input.Text)
+			for _, msg in ipairs(parsed) do
+				table.insert(allMessages, msg)
+			end
+		end
+
+		if #allMessages > 0 then
+			StartSpamming(allMessages)
+		else
+			StatusLabel.Text = "Add messages first!"
+			wait(1.5)
+			StatusLabel.Text = "Ready..."
+		end
+	end
+end)
+
+local SettingsPanel = Instance.new("Frame")
+SettingsPanel.Size = UDim2.new(0, 120, 0, 90)
+SettingsPanel.BackgroundColor3 = Colors.PANEL
+SettingsPanel.BorderSizePixel = 0
+SettingsPanel.Visible = false
+SettingsPanel.Parent = ScreenGui
+
+local SettingsTitle = Instance.new("TextLabel")
+SettingsTitle.Size = UDim2.new(1, 0, 0, 22)
+SettingsTitle.Text = "SETTINGS"
+SettingsTitle.Font = Enum.Font.GothamBold
+SettingsTitle.TextSize = 13
+SettingsTitle.TextColor3 = Colors.ACCENT
+SettingsTitle.BackgroundTransparency = 1
+SettingsTitle.Parent = SettingsPanel
+
+local function CreateToggle(label, yPos, settingKey)
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0.9, 0, 0, 22)
+	frame.Position = UDim2.new(0.05, 0, yPos, 0)
+	frame.BackgroundTransparency = 1
+	frame.Parent = SettingsPanel
+
+	local labelText = Instance.new("TextLabel")
+	labelText.Size = UDim2.new(0.7, 0, 1, 0)
+	labelText.Text = label
+	labelText.Font = Enum.Font.Gotham
+	labelText.TextSize = 11
+	labelText.TextColor3 = Colors.TEXT
+	labelText.BackgroundTransparency = 1
+	labelText.TextXAlignment = Enum.TextXAlignment.Left
+	labelText.Parent = frame
+
+	local toggleBtn = Instance.new("TextButton")
+	toggleBtn.Size = UDim2.new(0.25, 0, 0.7, 0)
+	toggleBtn.Position = UDim2.new(0.75, 0, 0.15, 0)
+	toggleBtn.Text = Settings[settingKey] and "ON" or "OFF"
+	toggleBtn.Font = Enum.Font.GothamBold
+	toggleBtn.TextSize = 10
+	toggleBtn.TextColor3 = Colors.TEXT
+	toggleBtn.BackgroundColor3 = Settings[settingKey] and Colors.GREEN or Colors.RED
+	toggleBtn.BorderSizePixel = 0
+	toggleBtn.Parent = frame
+
+	toggleBtn.MouseButton1Click:Connect(function()
+		Settings[settingKey] = not Settings[settingKey]
+		toggleBtn.Text = Settings[settingKey] and "ON" or "OFF"
+		toggleBtn.BackgroundColor3 = Settings[settingKey] and Colors.GREEN or Colors.RED
+
+		if settingKey == "RandomPrefix" then
+			UpdatePrefixButtons()
+		end
+	end)
+end
+
+CreateToggle("Random Order", 0.18, "RandomOrder")
+CreateToggle("Smart Pause", 0.45, "SmartPause")
+CreateToggle("Random Prefix", 0.72, "RandomPrefix")
+
+SettingsBtn.MouseButton1Click:Connect(function()
+	SettingsPanel.Visible = not SettingsPanel.Visible
+
+	if SettingsPanel.Visible then
+		local btnPos = SettingsBtn.AbsolutePosition
+		SettingsPanel.Position = UDim2.new(0, btnPos.X + 40, 0, btnPos.Y - 90)
+		SettingsBtn.BackgroundColor3 = Colors.ACCENT
+	else
+		SettingsBtn.BackgroundColor3 = Colors.BUTTON
+	end
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 and SettingsPanel.Visible then
+		local mousePos = input.Position
+		local panelPos = SettingsPanel.AbsolutePosition
+		local panelSize = SettingsPanel.AbsoluteSize
+		local btnPos = SettingsBtn.AbsolutePosition
+		local btnSize = SettingsBtn.AbsoluteSize
+
+		local panelRect = Rect.new(panelPos, panelPos + panelSize)
+		local btnRect = Rect.new(btnPos, btnPos + btnSize)
+
+		if not panelRect:Contains(mousePos) and not btnRect:Contains(mousePos) then
+			SettingsPanel.Visible = false
+			SettingsBtn.BackgroundColor3 = Colors.BUTTON
+		end
+	end
+end)
+
+LocalPlayer.CharacterAdded:Connect(StopSpamming)
